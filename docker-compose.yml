@@ -1,0 +1,41 @@
+version: "3.1"
+services:
+  db:
+    image: mysql
+    ports:
+      - "3306:3306"
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: 2Gf4Nr!12Q*s
+    volumes:
+      - ./conf/mysql:/etc/mysql/conf.d
+      - ./data:/var/lib/mysql
+    networks:
+      - default
+  www:
+    build: .
+    ports:
+      - "80:80"
+    volumes:
+      - ./www:/var/www/html:rw
+      - ./conf/vhosts:/etc/apache2/sites-enabled
+      - ./conf/php:/usr/local/etc/php/php.ini
+      - ./logs/apache2:/var/log/apache2
+    links:
+      - db
+    networks:
+      - default
+    environment:
+      UPLOAD_LIMIT: 950M
+      MAX_EXECUTION_TIME: 0
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    links:
+      - db:db
+    ports:
+      - 8000:80
+    environment:
+      MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: 2Gf4Nr!12Q*s
+      UPLOAD_LIMIT: 950M
+      MAX_EXECUTION_TIME: 0
